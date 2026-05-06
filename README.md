@@ -153,7 +153,7 @@ This repo is for **educational and defensive research only**. The payloads are d
 
 ---
 
-## LVideo Demonstration Link
+## Video Demonstration Link
 
 - Video - https://drive.google.com/drive/folders/1wbXjwe4D3h8Z8Q-ygF3qwthLencBFqyg?usp=sharing
 
